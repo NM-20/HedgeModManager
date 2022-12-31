@@ -31,6 +31,35 @@ Patch "Adjust Aspect Ratio to Resolution (experimental)" in "Graphics" by "M&M &
     WriteProtected<float>(AspectRatio, (float)Screen.Width / (float)Screen.Height); // 0x141222F9C
 }
 
+Patch "Always Cloudy on Islands" in "Weather" by "Hyper" does
+/*
+Forces the weather to Cloudy on supported islands.
+
+Supported islands;
+- Kronos
+- Ares
+- Chaos
+- Rhea
+- Ouranos
+*/
+{
+    void NOP(long addr)
+        => WriteProtected<byte>(addr, 0xEB, 0x4E);
+
+    /* 0x1401EE652 */
+    long callerFuncAddr = ScanSignature
+    (
+        "\xE8\xCC\xCC\xCC\xCC\x48\x8B\xCB\x8B\xF0\xE8\xCC\xCC\xCC\xCC\x8B\xF8",
+        "x????xxxxxx????xx"
+    );
+
+    /* 0x1401EE3ED */
+    NOP((callerFuncAddr + Read<short>(callerFuncAddr + 0x01) + 0x05) + 0x2D);
+
+    /* 0x1401EE4DD */
+    NOP(((callerFuncAddr + 0x0A) + Read<short>((callerFuncAddr + 0x0A) + 0x01) + 0x05) + 0x2D);
+}
+
 Patch "Always Day on Islands" in "Time" by "NM"
 {
     /*
@@ -112,6 +141,139 @@ Patch "Always Have Power Boost" in "Cheats" by "SuperSonic16"
     );
 }
 
+Patch "Always Play 1st Mvt. on Islands" in "Audio" by "Hyper"
+{
+    WriteProtected<byte>
+    (
+        /* 0x14C1A39AF */
+        ScanSignature
+        (
+            "\x45\x8B\x8E\xA4\x00\x00\x00",
+            "xxxxxxx"
+        ),
+        
+        Assemble("mov r9d, 1; nop")
+    );
+}
+
+Patch "Always Play 2nd Mvt. on Islands" in "Audio" by "Hyper"
+{
+    WriteProtected<byte>
+    (
+        /* 0x14C1A39AF */
+        ScanSignature
+        (
+            "\x45\x8B\x8E\xA4\x00\x00\x00",
+            "xxxxxxx"
+        ),
+        
+        Assemble("mov r9d, 2; nop")
+    );
+}
+
+Patch "Always Play 3rd Mvt. on Islands" in "Audio" by "Hyper"
+{
+    WriteProtected<byte>
+    (
+        /* 0x14C1A39AF */
+        ScanSignature
+        (
+            "\x45\x8B\x8E\xA4\x00\x00\x00",
+            "xxxxxxx"
+        ),
+        
+        Assemble("mov r9d, 3; nop")
+    );
+}
+
+Patch "Always Play 4th Mvt. on Islands" in "Audio" by "Hyper"
+{
+    WriteProtected<byte>
+    (
+        /* 0x14C1A39AF */
+        ScanSignature
+        (
+            "\x45\x8B\x8E\xA4\x00\x00\x00",
+            "xxxxxxx"
+        ),
+        
+        Assemble("mov r9d, 4; nop")
+    );
+}
+
+Patch "Always Play 5th Mvt. on Islands" in "Audio" by "Hyper"
+{
+    WriteProtected<byte>
+    (
+        /* 0x14C1A39AF */
+        ScanSignature
+        (
+            "\x45\x8B\x8E\xA4\x00\x00\x00",
+            "xxxxxxx"
+        ),
+        
+        Assemble("mov r9d, 5; nop")
+    );
+}
+
+Patch "Always Play 6th Mvt. on Islands" in "Audio" by "Hyper"
+{
+    WriteProtected<byte>
+    (
+        /* 0x14C1A39AF */
+        ScanSignature
+        (
+            "\x45\x8B\x8E\xA4\x00\x00\x00",
+            "xxxxxxx"
+        ),
+        
+        Assemble("mov r9d, 6; nop")
+    );
+}
+
+Patch "Always Play 7th Mvt. on Islands" in "Audio" by "Hyper"
+{
+    WriteProtected<byte>
+    (
+        /* 0x14C1A39AF */
+        ScanSignature
+        (
+            "\x45\x8B\x8E\xA4\x00\x00\x00",
+            "xxxxxxx"
+        ),
+        
+        Assemble("mov r9d, 7; nop")
+    );
+}
+
+Patch "Always Rainy on Islands" in "Weather" by "Hyper" does
+/*
+Forces the weather to Rainy on supported islands.
+
+Supported islands;
+- Kronos
+- Chaos
+- Rhea
+- Ouranos
+*/
+{
+    void NOP(long addr)
+        => WriteProtected<byte>(addr, 0xEB, 0x38);
+
+    /* 0x1401EE652 */
+    long callerFuncAddr = ScanSignature
+    (
+        "\xE8\xCC\xCC\xCC\xCC\x48\x8B\xCB\x8B\xF0\xE8\xCC\xCC\xCC\xCC\x8B\xF8",
+        "x????xxxxxx????xx"
+    );
+
+    /* 0x1401EE3ED */
+    NOP((callerFuncAddr + Read<short>(callerFuncAddr + 0x01) + 0x05) + 0x2D);
+
+    /* 0x1401EE4DD */
+    NOP(((callerFuncAddr + 0x0A) + Read<short>((callerFuncAddr + 0x0A) + 0x01) + 0x05) + 0x2D);
+}
+
 Patch "Always Run in the Background" in "System" by "NM" does "Stops the game from pausing when the window is unfocused."
 {
     WriteProtected<byte>
@@ -125,6 +287,60 @@ Patch "Always Run in the Background" in "System" by "NM" does "Stops the game fr
 
         0xEB
     );
+}
+
+Patch "Always Sandstorm on Islands" in "Weather" by "Hyper" does
+/*
+Forces the weather to Sandstorm on supported islands.
+
+Supported islands;
+- Ares
+*/
+{
+    void NOP(long addr)
+        => WriteProtected<byte>(addr, 0xEB, 0x22);
+
+    /* 0x1401EE652 */
+    long callerFuncAddr = ScanSignature
+    (
+        "\xE8\xCC\xCC\xCC\xCC\x48\x8B\xCB\x8B\xF0\xE8\xCC\xCC\xCC\xCC\x8B\xF8",
+        "x????xxxxxx????xx"
+    );
+
+    /* 0x1401EE3ED */
+    NOP((callerFuncAddr + Read<short>(callerFuncAddr + 0x01) + 0x05) + 0x2D);
+
+    /* 0x1401EE4DD */
+    NOP(((callerFuncAddr + 0x0A) + Read<short>((callerFuncAddr + 0x0A) + 0x01) + 0x05) + 0x2D);
+}
+
+Patch "Always Sunny on Islands" in "Weather" by "Hyper" does
+/*
+Forces the weather to Sunny on supported islands.
+
+Supported islands;
+- Kronos
+- Ares
+- Chaos
+- Rhea
+- Ouranos
+*/
+{
+    void NOP(long addr)
+        => WriteProtected<byte>(addr, 0xEB);
+
+    /* 0x1401EE652 */
+    long callerFuncAddr = ScanSignature
+    (
+        "\xE8\xCC\xCC\xCC\xCC\x48\x8B\xCB\x8B\xF0\xE8\xCC\xCC\xCC\xCC\x8B\xF8",
+        "x????xxxxxx????xx"
+    );
+
+    /* 0x1401EE3ED */
+    NOP((callerFuncAddr + Read<short>(callerFuncAddr + 0x01) + 0x05) + 0x2D);
+
+    /* 0x1401EE4DD */
+    NOP(((callerFuncAddr + 0x0A) + Read<short>((callerFuncAddr + 0x0A) + 0x01) + 0x05) + 0x2D);
 }
 
 Patch "Always Trickable Dash Rings" in "Cheats" by "Hyper"
@@ -516,6 +732,21 @@ Patch "Disable Camera Shake" in "Graphics" by "Hyper" does "Disables camera shak
     );
 }
 
+Patch "Disable Challenge Marker Scanner" in "Gameplay" by "Hyper" does "Disables the scanning event and map transition after completing challenges."
+{
+    WriteProtected<byte>
+    (
+        /* 0x149477152 */
+        ScanSignature
+        (
+            "\x74\x1E\x41\x83\xF8\x01\x75\x70",
+            "xxxxxxxx"
+        ),
+
+        0xEB, 0x76
+    );
+}
+
 Patch "Disable Chromatic Aberration" in "Graphics" by "Luig & Hyper" does "Disables the RGB separation effect at edges of the screen in certain scenarios."
 {
     WriteNop
@@ -528,6 +759,61 @@ Patch "Disable Chromatic Aberration" in "Graphics" by "Luig & Hyper" does "Disab
         ),
 
         4
+    );
+}
+
+Patch "Disable Corruption Animations" in "Animation" by "Hyper" does "Disables the animations for when Sonic becomes increasingly more corrupted in the later islands."
+{
+    // LANDING_CORRUPTION_WEAK
+    WriteProtected<byte>
+    (
+        /* 0x140830C7D */
+        ScanSignature
+        (
+            "\x74\x15\xB8\x04\x00\x00\x00\x48\x8B\x5C\x24\x30",
+            "xxxxxxxxxxxx"
+        ),
+        
+        0xEB
+    );
+
+    // LANDING_CORRUPTION_STRONG
+    WriteNop
+    (
+        /* 0x140830CA8 */
+        ScanSignature
+        (
+            "\xBA\x05\x00\x00\x00\x0F\x45\xCA\x8B\xC1",
+            "xxxxxxxxxx"
+        ),
+        
+        8
+    );
+
+    // IDLE_CORRUPTION_WEAK_LOOP
+    WriteProtected<byte>
+    (
+        /* 0x140830DB4 */
+        ScanSignature
+        (
+            "\x74\x15\xB8\x0B\x00\x00\x00",
+            "xxxxxxx"
+        ),
+        
+        0xEB
+    );
+
+    // IDLE_CORRUPTION_STRONG_LOOP
+    WriteProtected<byte>
+    (
+        /* 0x140830DDA */
+        ScanSignature
+        (
+            "\x74\x15\xB8\x0C\x00\x00\x00",
+            "xxxxxxx"
+        ),
+        
+        0xEB
     );
 }
 
@@ -602,6 +888,35 @@ Patch "Disable Fixed Camera Notifications" in "UI" by "Hyper" does "Disables the
         ),
 
         0xE9, 0x5C, 0x01, 0x00, 0x00
+    );
+}
+
+Patch "Disable Forced Weather for Bosses" in "Weather" by "Hyper" does "Disables the weather being forced to Sunny for Giganto and Supreme."
+{
+    // Giganto
+    WriteProtected<byte>
+    (
+        /* 0x14024E456 */
+        ScanSignature
+        (
+            "\x74\x0A\x33\xD2\x48\x8B\xC8\xE8\xCC\xCC\xCC\xCC\x48\x8B\x46\x18\x48\x8B\x48\x28\x48\x8B\x59\x48\xE8\xCC\xCC\xCC\xCC\x48\x8B\xD0\x48\x8B\xCB\xE8\xCC\xCC\xCC\xCC\x48\x8B\xD8",
+            "xxxxxxxx????xxxxxxxxxxxxx????xxxxxxx????xxx"
+        ),
+        
+        0xEB
+    );
+
+    // Supreme
+    WriteProtected<byte>
+    (
+        /* 0x1402AFE04 */
+        ScanSignature
+        (
+            "\x74\x0A\x33\xD2\x48\x8B\xC8\xE8\xCC\xCC\xCC\xCC\x48\x8B\x46\x18\x48\x8B\x48\x28\x48\x8B\x59\x48\xE8\xCC\xCC\xCC\xCC\x48\x8B\xD0\x48\x8B\xCB\xE8\xCC\xCC\xCC\xCC\x45\x33\xFF",
+            "xxxxxxxx????xxxxxxxxxxxxx????xxxxxxx????xxx"
+        ),
+        
+        0xEB
     );
 }
 
@@ -903,6 +1218,29 @@ Patch "Disable Ring Loss" in "Cheats" by "M&M"
         ),
 
         0xC3
+    );
+}
+
+Patch "Disable Save/Load Deny" in "UI" by "Hyper" does
+/*
+Disables the permission change that prohibits you from being able to save and load during combat.
+
+This also allows you to save as soon as you have the Save Data menu within the tutorial area.
+
+Known issues;
+- Saving immediately after acquiring Cyloop will create a save file that softlocks upon loading - please progress further before saving.
+*/
+{
+    WriteProtected<byte>
+    (
+        /* 0x14D10DF81 */
+        ScanSignature
+        (
+            "\x74\x0E\x83\xFE\x01",
+            "xxxxx"
+        ),
+        
+        0xEB
     );
 }
 
@@ -1269,6 +1607,35 @@ Patch "Fix Resolution Resetting on Launch" in "Fixes" by "Hyper" does "Fixes a b
     );
 }
 
+Patch "Fix Upreel Grip Position" in "Fixes" by "ĐeäTh" does "Adjusts Sonic's grip position on the Upreel object's handle so that it lines up with the actual object."
+{
+    IntPtr gripOffsetPtr = System.Runtime.InteropServices.Marshal.AllocHGlobal(16);
+    *((float*)gripOffsetPtr + 0) = 0.0f;
+    *((float*)gripOffsetPtr + 1) = -1.025f;
+    *((float*)gripOffsetPtr + 2) = 0.0f;
+    *((float*)gripOffsetPtr + 3) = 0.0f;
+
+    WriteAsmHook
+    (
+        $@"
+            mov rax, {(long)gripOffsetPtr}
+            movups xmm15, [rax]
+            mulps xmm0, xmm15
+            lea rdx, [rbp - 0x39]
+            lea rcx, [rbp - 0x69]
+        ",
+
+        /* v1.10: 0x1498C86A7 */
+        ScanSignature
+        (
+            "\x0F\x59\x05\xCC\xCC\xCC\xCC\x48\x8D\x55\xC7\x48\x8D\x4D\x97\x0F\x29\x45\xD7\xE8\xCC\xCC\xCC\xCC\x0F\x28\x45\xB7\x0F\x58\x00\x0F\x11\x46\x30\x0F\x28\x45\xC7\x0F\x11\x46\x40\xE9\xAF\x00\x00\x00\x0F\xB6\x81\xC8\x02\x00\x00\xA8\x01\x0F\x84\xA0\x00\x00\x00\x24\xFE\x31\xDB",
+            "xxx????xxxxxxxxxxxxx????xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        ),
+
+        HookBehavior.Replace
+    );
+}
+
 Patch "Force 4K Video Playback" in "Graphics" by "Hyper" does "Forces the game to use the pre-rendered cutscenes encoded at 4K, regardless of game resolution."
 {
     WriteNop
@@ -1452,6 +1819,48 @@ Patch "Hide Boost Gauge" in "UI" by "Hyper"
     );
 }
 
+Patch "Hide Challenge Markers" in "Graphics" by "Hyper" does "Hides the markers that appear next to challenges on the islands."
+{
+    // Hide map sensor visual.
+    WriteProtected<byte>
+    (
+        /* 0x1403BF63B */
+        ScanSignature
+        (
+            "\x74\x17\x48\x8D\x55\xD7\x48\x8B\xC8\xE8\xCC\xCC\xCC\xCC\x48\x8B\xD3\x48\x8B\xCF\xE8\xCC\xCC\xCC\xCC\x48\x8B\x8F\x58\x02\x00\x00",
+            "xxxxxxxxxx????xxxxxxx????xxxxxxx"
+        ),
+        
+        0xEB
+    );
+
+    // Hide map sensor prerequisite marker.
+    WriteProtected<byte>
+    (
+        /* 0x1403BF6B3 */
+        ScanSignature
+        (
+            "\x0F\x85\xE5\x00\x00\x00\xE8",
+            "xxxxxxx"
+        ),
+        
+        0xE9, 0xE6, 0x00, 0x00, 0x00
+    );
+
+    // Hide map sensor name.
+    WriteProtected<byte>
+    (
+        /* 0x1408D128F */
+        ScanSignature
+        (
+            "\x0F\x8E\x47\x02\x00\x00\x4C\x89\xA4\x24\x58\x01\x00\x00",
+            "xxxxxxxxxxxxxx"
+        ),
+        
+        0xE9, 0x48, 0x02, 0x00, 0x00
+    );
+}
+
 Patch "Hide Drift Dash Panels" in "Graphics" by "Hyper" does "Hides the drift dash panels, but still allows them to function, similarly to drift zones in Sonic Colours."
 {
     // Remove model.
@@ -1478,6 +1887,21 @@ Patch "Hide Drift Dash Panels" in "Graphics" by "Hyper" does "Hides the drift da
         ),
 
         5
+    );
+}
+
+Patch "Hide Enemy Health Gauge" in "UI" by "Hyper & Gordon Ramsay" does "Hides the health gauge for standard enemies and guardians."
+{
+    WriteProtected<byte>
+    (
+        /* 0x1404FC4CB */
+        ScanSignature
+        (
+            "\x0F\x84\xF7\x00\x00\x00\xBA\x44\x23\x00\x00",
+            "xxxxxxxxxxx"
+        ),
+
+        0xE9, 0xF8, 0x00, 0x00, 0x00
     );
 }
 
@@ -1598,6 +2022,42 @@ Patch "Infinite Boost Gauge" in "Cheats" by "Hyper"
     );
 }
 
+Code "Infinite Skill Points" in "Cheats" by "Hyper"
+//
+    static bool Initialised = false;
+
+    static long Pointer = 0;
+//
+{
+    if (!Initialised)
+    {
+        fixed (long* pPointer = &Pointer)
+        {
+            WriteAsmHook
+            (
+                $@"
+                    mov rax, {(long)pPointer}
+                    mov [rax], rbx
+                ",
+
+                /* 0x14014425D */
+                ScanSignature
+                (
+                    "\x0F\x85\x6D\x01\x00\x00\x83\x79\x0C\x00",
+                    "xxxxxxxxxx"
+                ),
+
+                HookBehavior.Replace
+            );
+        }
+
+        Initialised = true;
+    }
+
+    if (Pointer != 0)
+        *(short*)((Pointer - 0x70) + 0x84) = 999;
+}
+
 Patch "Infinite Training Simulator Timer" in "Cheats" by "Hyper" does "Allows the timer in Training Simulator to drop below zero and continue uninterrupted."
 {
     WriteProtected<byte>
@@ -1631,4 +2091,54 @@ Patch "Infinite Quick Cyloop Gauge" in "Cheats" by "NM"
 
         HookBehavior.Replace
     );
+}
+
+Patch "Play Random Mvt. Soundtrack on Islands" in "Audio" by "Hyper" does
+/*
+Plays a random movement every time you switch to any of the supported islands.
+
+Supported islands;
+- Kronos
+- Ares
+- Chaos
+
+Rhea only has one soundtrack and will not change.
+
+Ouranos only has one soundtrack, but will play Kronos Island: 2nd Mvt. if the random number is greater than 3.
+*/
+//
+    static byte[] Format = System.Text.Encoding.UTF8.GetBytes("%s_%d");
+//
+{
+    fixed (byte* pFormat = Format)
+    {
+        WriteAsmHook
+        (
+            @$"
+            rand:
+                rdrand rax
+                and    rax, 7
+                inc    rax
+
+                ; Generate new random number if the result is greater than 7.
+                cmp rax, 7
+                jg  rand
+
+                mov r9d, eax
+
+                ; Load format string, since we overwrote the original instruction with the hook jump.
+                mov rax, {(long)pFormat}
+                lea rdx, [rax]
+            ",
+
+            /* 0x14C1A39AF */
+            ScanSignature
+            (
+                "\x45\x8B\x8E\xA4\x00\x00\x00",
+                "xxxxxxx"
+            ),
+
+            HookBehavior.Replace
+        );
+    }
 }
