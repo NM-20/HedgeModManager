@@ -35,6 +35,7 @@ using System.Windows.Media;
 using System.Windows.Documents;
 using System.Xml.Linq;
 using GongSolutions.Wpf.DragDrop.Utilities;
+using HedgeModManager.CodeCompiler;
 
 namespace HedgeModManager
 {
@@ -173,7 +174,7 @@ namespace HedgeModManager
                     }
                 }
 
-                CodesTree.ItemsSource = CodesDatabase.Codes.OrderBy(x => x.Category).ThenBy(x => x.Name).GroupBy(x => x.Category).Select
+                CodesTree.ItemsSource = CodesDatabase.ExecutableCodes.OrderBy(x => x.Category).ThenBy(x => x.Name).GroupBy(x => x.Category).Select
                 (
                     (cat) =>
                     {
@@ -233,14 +234,11 @@ namespace HedgeModManager
                         CodesList.Items.Insert(0, code);
                 }
 
-                CodesDatabase.Codes.ForEach
-                (
-                    (code) =>
-                    {
-                        if (!code.Enabled)
-                            CodesList.Items.Add(code);
-                    }
-                );
+                foreach (var code in CodesDatabase.ExecutableCodes)
+                {
+                    if (!code.Enabled)
+                        CodesList.Items.Add(code);
+                }
             }
         }
 
@@ -410,7 +408,7 @@ namespace HedgeModManager
             CodesList.Items.Clear();
 
             int enabledIndex = 0;
-            foreach (Code code in CodesDatabase.Codes)
+            foreach (var code in CodesDatabase.ExecutableCodes)
             {
                 if
                 (
@@ -449,6 +447,7 @@ namespace HedgeModManager
 
         private void UI_CodesTab_Click(object sender, RoutedEventArgs e)
         {
+            InvokeChangeCodesView(RegistryConfig.CodesUseTreeView);
             if (CodesDatabase == null || CodesDatabase.Codes.Count == 0)
             {
                 CodesStatusLbl.Visibility = Visibility.Visible;
@@ -482,7 +481,7 @@ namespace HedgeModManager
 
             try
             {
-                await Singleton.GetInstance<HttpClient>().DownloadFileAsync(HedgeApp.CurrentGame.CodesURL,
+                await Singleton.GetInstance<HttpClient>().DownloadFileAsync(HedgeApp.CurrentGame.CodesURL + $"?t={DateTime.Now:yyyyMMddHHmmss}",
                     CodeProvider.CodesTextPath, null, token);
 
                 Dispatcher.Invoke(Refresh);
@@ -513,21 +512,28 @@ namespace HedgeModManager
             {
                 // Codes from disk.
                 string localCodes = File.ReadAllText(CodeProvider.CodesTextPath);
-                string repoCodes = await Singleton.GetInstance<HttpClient>().GetStringAsync(HedgeApp.CurrentGame.CodesURL);
+                string repoCodes = await Singleton.GetInstance<HttpClient>().GetStringAsync(HedgeApp.CurrentGame.CodesURL + $"?t={DateTime.Now:yyyyMMddHHmmss}");
 
-                if (localCodes == repoCodes)
+                if (ViewModel.CPKREDIR.UpdateCodesOnLaunch && localCodes != repoCodes)
                 {
-                    CodesOutdated = false;
-
-                    // Codes are the same, so use default text.
-                    Button_DownloadCodes.SetResourceReference(ContentProperty, "CodesUIDownload");
+                    UpdateCodes();
                 }
                 else
                 {
-                    CodesOutdated = true;
+                    if (localCodes == repoCodes)
+                    {
+                        CodesOutdated = false;
 
-                    // Codes are different, report update possibility.
-                    Button_DownloadCodes.SetResourceReference(ContentProperty, "CodesUIUpdate");
+                        // Codes are the same, so use default text.
+                        Button_DownloadCodes.SetResourceReference(ContentProperty, "CodesUIDownload");
+                    }
+                    else
+                    {
+                        CodesOutdated = true;
+
+                        // Codes are different, report update possibility.
+                        Button_DownloadCodes.SetResourceReference(ContentProperty, "CodesUIUpdate");
+                    }
                 }
             }
             catch (HttpRequestException) { /* do nothing for http exceptions */ }
@@ -1414,19 +1420,13 @@ namespace HedgeModManager
                 RefreshProfiles();
                 Refresh();
                 UpdateStatus(string.Format(Localise("StatusUIGameChange"), HedgeApp.CurrentGame));
-                if (HedgeApp.CurrentGame != Games.Unknown)
-                {
-                    // Schedule checking for code updates if available.
-                    if (Button_DownloadCodes.IsEnabled)
-                        await CheckForCodeUpdates();
-                }
                 await CheckForUpdatesAsync();
             }
 
             await RunTask(CheckForLoaderUpdateAsync());
         }
 
-        private void UI_Download_Codes(object sender, RoutedEventArgs e)
+        private void UpdateCodes()
         {
             UpdateStatus(string.Format(Localise("StatusUIDownloadingCodes"), HedgeApp.CurrentGame));
             try
@@ -1438,7 +1438,8 @@ namespace HedgeModManager
                    is contaminated with codes from ExtraCodes.hmm */
                 var oldCodes = codesFileExists ? new CodeFile(codesFilePath) : null;
 
-                var downloader = new DownloadWindow(LocaliseFormat("StatusUIDownloadingCodes", HedgeApp.CurrentGame), HedgeApp.CurrentGame.CodesURL, codesFilePath)
+                var downloader = new DownloadWindow(LocaliseFormat("StatusUIDownloadingCodes", HedgeApp.CurrentGame),
+                    HedgeApp.CurrentGame.CodesURL + $"?t={DateTime.Now:yyyyMMddHHmmss}", codesFilePath)
                 {
                     DownloadCompleted = () =>
                     {
@@ -1491,6 +1492,11 @@ namespace HedgeModManager
             {
                 UpdateStatus(Localise("StatusUIDownloadFailed"));
             }
+        }
+
+        private void UI_Download_Codes(object sender, RoutedEventArgs e)
+        {
+            UpdateCodes();
         }
 
         private void UI_OpenMods_Click(object sender, RoutedEventArgs e)
@@ -1927,7 +1933,6 @@ namespace HedgeModManager
 
         private void MainTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            InvokeChangeCodesView(RegistryConfig.CodesUseTreeView);
             if (RefreshButton != null)
             {
                 RefreshButton.IsEnabled = MainTabControl.SelectedItem != SettingsTab;

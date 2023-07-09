@@ -15,6 +15,7 @@ using HedgeModManager.Serialization;
 using HedgeModManager.UI;
 using Newtonsoft.Json;
 using static HedgeModManager.Lang;
+using HedgeModManager.CodeCompiler;
 
 namespace HedgeModManager
 {
@@ -211,7 +212,7 @@ namespace HedgeModManager
 
                 foreach (var code in CodesDatabase.Codes)
                 {
-                    if (code.Enabled)
+                    if (code.Enabled || code.Type == CodeType.Library)
                         codes.Add(code);
                 }
 
